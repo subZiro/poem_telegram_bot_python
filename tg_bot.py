@@ -31,7 +31,7 @@ commands = {  # command description used in the "help" command
 
 
 def auth(func):
-    # защита от пользования ботом другими пользователями
+    # на удаление
     def wrapper(message):
         if message.chat.id == TG_ADMIN_ID:
             return func(message)
@@ -42,16 +42,14 @@ def auth(func):
     return wrapper
 
 
-# --start use bot--#
-@auth
+# --start comand-- #
 @bot.message_handler(commands=['start'])
 def welcome(message):
     bot.send_message(message.chat.id, "Привет, отправь мне что-нибудь")
     user_id = message.chat.id
 
 
-# --help page--#
-@auth
+# --help comand-- #
 @bot.message_handler(commands=['help'])
 def command_help(message):
     user_id = message.chat.id
@@ -62,8 +60,7 @@ def command_help(message):
     bot.send_message(user_id, help_text)  # send the generated help page
 
 
-# --get random poem--#
-@auth
+# --random command-- #
 @bot.message_handler(commands=['random'])
 def command_random(message):
     user_id = message.chat.id
@@ -71,19 +68,52 @@ def command_random(message):
     bot.send_message(user_id, d1)  # show the keyboard
 
 
-@auth
+# --author command-- #
+@bot.message_handler(command=['author'])
+def command_author(message):
+    #
+    pass
+
+
+# --next command--#
+@bot.message_handler(command=['next'])
+def command_author(message):
+    #
+    pass
+
+
+# --book command-- #
+@bot.message_handler(command=['book'])
+def command_author(message):
+    #
+    pass
+
+
+# --info command-- #
+@bot.message_handler(command=['info'])
+def command_author(message):
+    #
+    pass
+
+
+# --restart command-- #
+@bot.message_handler(command=['restart'])
+def command_author(message):
+    #
+    pass
+
+
+# --any text message-- #
 @bot.message_handler(content_types=["text"])
 def send_text(message):
-    """Название функции не играет никакой роли, в принципе
-	"""
+    # ---- #
     if message.text.lower() == 'привет':
-        bot.send_message(message.chat.id, 'Приветствую тебя')
+        bot.send_message(message.chat.id, f'Приветствую тебя, {message.chat.first_name}!')
     elif message.text.lower() == 'пока':
         bot.send_message(message.chat.id, 'Прощай, но ты заходи хоть иногда')
-    elif message.text.lower() == 'хуй':
-        bot.send_message(message.chat.id, f'{message.chat.first_name} соси нигерскую письку')
     else:
-        bot.send_message(message.chat.id, message.text)
+        bot.send_message(message.chat.id, 'Такой команды я не знаю =(.\n' +
+                         'Посмотрите список всех команд "/help"')
 
 
 if __name__ == '__main__':
