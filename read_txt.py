@@ -1,27 +1,21 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-
-# read txt book 
 import os
 import re
-#import pandas as pd
-
-
 
 
 def f_read_files_in_folder(foldername:str):
 	# read txt files in folder
-	
 	if not os.path.exists(foldername):
 		os.makedirs(foldername)
 		
 	folder = os.listdir(foldername)
 	files_list = []
 	for f in folder:
-			if f[-4:] == '.txt':
-				f = os.path.join(foldername, f)
-				files_list.append(f)
+		if f[-4:] == '.txt':
+			f = os.path.join(foldername, f)
+			files_list.append(f)
 		
 	return files_list
 
@@ -111,7 +105,6 @@ def f_array_to_BATSD(array:list):
 		
 		if stih_index+1 >= len(array):
 			date_stih.append('19**')
-		
 		else:
 			if array[stih_index+1] in title_stih or array[stih_index+1] in stih_list:
 				date_stih.append('19**')
@@ -131,14 +124,8 @@ def f_concat_natds(n, a, t, s, d):
 	return result
 
 
-
-
-
-
-
 # add txt file in folder to read list
 files_list = f_read_files_in_folder('txt_books')
-
 
 dataset = []
 
@@ -156,9 +143,4 @@ for file in files_list:
 		if b[i] not in [item[3] for item in dataset]:
 			dataset.extend(book)
 
-	#os.remove(file)  # удаление сканированноего файла
-
-
-
-
-
+	os.remove(file)  # удаление сканированноего файла
