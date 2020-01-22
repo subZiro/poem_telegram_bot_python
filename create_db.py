@@ -18,9 +18,16 @@ def f_create_table_db(file_db: str):
                 (poem_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 book text, 
                 author text, 
-                title_stih text, 
-             §   stih text, 
-                date_stih text)""")
+                title_stih text,
+                stih text, 
+                date_stih text)
+                """)
+
+            cursor.execute("""CREATE TABLE users(
+                user_id int,
+                received_poem_id text,
+                received_author text
+                )""")
             conn.commit()
             print('database created!!!')
 
