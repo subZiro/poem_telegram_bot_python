@@ -72,7 +72,7 @@ def command_help(message):
 @auth
 def command_random(message):
     user = message.chat.id
-    r_poem = db.f_select_random_poem()
+    r_poem = db.f_get_random_poem()
 
     author = r_poem[2]
     title = r_poem[3]
@@ -91,12 +91,19 @@ def command_author(message):
     bot.send_message(user, 'команда author пока в разработке')
 
 
-# --next command--#
+# --next command-- #
 @bot.message_handler(commands=['next'])
 @auth
 def command_next(message):
-    #
-    bot.send_message(message.chat.id, 'команда next пока в разработке')
+    user = message.chat.id
+    n_poem = db.f_get_next(user)
+    
+    author = n_poem[2]
+    title = n_poem[3]
+    poem = title.center(40, '_') + '\n\n' + n_poem[4] + '\n' + author.rjust(40, '\x20')
+    db.f_update_read_user(user, n_poem[0], author)
+
+    bot.send_message(user, poem)
 
 
 # --book command-- #
@@ -113,9 +120,10 @@ def command_book(message):
 @bot.message_handler(commands=['info'])
 @auth
 def command_info(message):
-    #
+    # сколько получил пользователь стихотворений от бота
     user = message.chat.id
-    bot.send_message(user, 'команда info пока в разработке')
+    inf_text = db.f_info_about_u_read(user)
+    bot.send_message(user, inf_text)
 
 
 # --restart command-- #
