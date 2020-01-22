@@ -72,7 +72,7 @@ def command_help(message):
 @auth
 def command_random(message):
     user = message.chat.id
-    r_poem = db.f_get_random_poem()
+    r_poem = db.f_get_poem()
 
     author = r_poem[2]
     title = r_poem[3]
@@ -112,7 +112,7 @@ def command_next(message):
 def command_book(message):
     # информация о стихотворениях в базе
     user = message.chat.id
-    ib_text = db.f_info_about_book()
+    ib_text = db.f_info_about_book(user)
     bot.send_message(user, ib_text)
 
 
@@ -123,6 +123,8 @@ def command_info(message):
     # сколько получил пользователь стихотворений от бота
     user = message.chat.id
     inf_text = db.f_info_about_u_read(user)
+    if not inf_text:
+        inf_text = 'Ваш список просмотров пуст'
     bot.send_message(user, inf_text)
 
 
