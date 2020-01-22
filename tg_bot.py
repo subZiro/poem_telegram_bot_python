@@ -25,32 +25,39 @@ commands = {  # command description used in the "help" command
     'author': 'Выбрать автора',
     'next': 'Получить следующее стихотворение',
     'book': 'Получить информацию о хранимых ситхотворениях',
-    'info': 'Получить информацию о хранимых стихотворениях',
-    'restart': 'Сброс всей статистии'
+    'info': 'Получить статистику по прочитанным стихотворениям',
+    'restart': 'Сброс всей статистии',
+    'reset': 'Сброс выборки по авторам',
+    'end': 'Удаление бота, завершение работы с ботом'
 }
 
 
 def auth(func):
-    # на удаление
     def wrapper(message):
-        if message.chat.id == TG_ADMIN_ID:
+        user = message.chat.id
+        if db.f_user_in_table(user):
             return func(message)
         else:
-            bot.send_message(message.chat.id, 'У вас нет доступа')
+            bot.send_message(user, f'{message.chat.first_name}, У вас нет доступа.\n' +
+                'Введите команду /start для начала работы')
             return False
-
     return wrapper
 
 
 # --start comand-- #
 @bot.message_handler(commands=['start'])
 def welcome(message):
-    bot.send_message(message.chat.id, "Привет, отправь мне что-нибудь")
-    user_id = message.chat.id
+    user = message.chat.id
+    if not db.f_user_in_table(user):
+        db.f_reg_user(user)
+        bot.send_message(user, "Привет, как дела?\nСписок доступных команд /help")
+    else:
+        bot.send_message(user, "Привет, еще раз!")
 
 
 # --help comand-- #
 @bot.message_handler(commands=['help'])
+@auth
 def command_help(message):
     user_id = message.chat.id
     help_text = "Доступны следующие команды: \n"
@@ -62,49 +69,86 @@ def command_help(message):
 
 # --random command-- #
 @bot.message_handler(commands=['random'])
+@auth
 def command_random(message):
-    user_id = message.chat.id
-    d1 = db.f_select_random_poem()
-    bot.send_message(user_id, d1)  # show the keyboard
+    user = message.chat.id
+    r_poem = db.f_select_random_poem()
+
+    author = r_poem[2]
+    title = r_poem[3]
+    poem = title.center(40, '_') + '\n\n' + r_poem[4] + '\n' + author.rjust(40, '\x20')
+    db.f_update_read_user(user, r_poem[0], author)
+
+    bot.send_message(user, poem)
 
 
 # --author command-- #
-@bot.message_handler(command=['author'])
+@bot.message_handler(commands=['author'])
+@auth
 def command_author(message):
     #
-    pass
+    user = message.chat.id
+    bot.send_message(user, 'команда author пока в разработке')
 
 
 # --next command--#
-@bot.message_handler(command=['next'])
-def command_author(message):
+@bot.message_handler(commands=['next'])
+@auth
+def command_next(message):
     #
-    pass
+    bot.send_message(message.chat.id, 'команда next пока в разработке')
 
 
 # --book command-- #
-@bot.message_handler(command=['book'])
-def command_author(message):
-    #
-    pass
+@bot.message_handler(commands=['book'])
+@auth
+def command_book(message):
+    # информация о стихотворениях в базе
+    user = message.chat.id
+    ib_text = db.f_info_about_book()
+    bot.send_message(user, ib_text)
 
 
 # --info command-- #
-@bot.message_handler(command=['info'])
-def command_author(message):
+@bot.message_handler(commands=['info'])
+@auth
+def command_info(message):
     #
-    pass
+    user = message.chat.id
+    bot.send_message(user, 'команда info пока в разработке')
 
 
 # --restart command-- #
-@bot.message_handler(command=['restart'])
-def command_author(message):
+@bot.message_handler(commands=['restart'])
+@auth
+def command_restart(message):
     #
-    pass
+    user = message.chat.id
+    bot.send_message(user, 'команда restart пока в разработке')
+
+
+# --reset command-- #
+@bot.message_handler(commands=['reset'])
+@auth
+def command_reset(message):
+    #
+    user = message.chat.id
+    bot.send_message(user, 'команда reset пока в разработке')
+
+
+# --end command-- #
+@bot.message_handler(commands=['end'])
+@auth
+def command_end(message):
+    # удаление пользователя из бд
+    user = message.chat.id
+    db.f_delete_user(user)
+    bot.send_message(user, 'Прощай, я буду скучать')
 
 
 # --any text message-- #
 @bot.message_handler(content_types=["text"])
+@auth
 def send_text(message):
     # ---- #
     if message.text.lower() == 'привет':
@@ -119,7 +163,7 @@ def send_text(message):
 if __name__ == '__main__':
     try:
         print('start_bot')
-        bot.polling(timeout=30)
+        bot.polling(timeout=30, none_stop=True)
     except Exception as e:
         print(e.args)
         sleep(10)
