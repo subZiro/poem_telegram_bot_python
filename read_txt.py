@@ -138,9 +138,10 @@ for file in files_list:
 
 	b = [item[3] for item in book]   # список стихов из сканируеммого файла
 
+	
 	#----если такого стиха нет в датасете то добавляем его----#
 	for i in range(len(b)):
 		if b[i] not in [item[3] for item in dataset]:
 			dataset.extend(book)
 
-	os.remove(file)  # удаление сканированноего файла
+	#os.remove(file)  # удаление сканированноего файла
