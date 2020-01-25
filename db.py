@@ -32,7 +32,6 @@ def f_user_in_table(user_id:int):
     user_id_table = [elem[0] for elem in user_table]
     if user_id in user_id_table:
         flg = True
-
     return flg
         
 
@@ -61,7 +60,6 @@ def f_get_poem(index=None):
     db = f_select_all_db('poems')
     if not index:
         index = randint(1, len(db))
-
     return db[index-1]
 
 
@@ -123,11 +121,7 @@ def f_update_read_user(user_id, p, a):
             WHERE user_id = ?"""
     cursor.execute(sql, (poem, author, user_id))
     print(f'пользователь {user_id} получил стихотворение {p}')
-    
 
-    # для полученмя информации
-    #p,a = re.split(r',', r[1:-1], maxsplit=1)
-    #print(p)
     
 def f_info_about_book(user_id):
     # получение информации о хранимых в бд стихотворениях и авторах
@@ -138,17 +132,16 @@ def f_info_about_book(user_id):
     result_text = f'В базе храниться {len(db)} стихотворений' + '\n'
     for i in range(len(author_set)):
         result_text += f'Из них {author.count(author_set[i])} авторства "{author_set[i]}"' + '\n'
-
     print(f'пользователь {user_id} запросил информацию по книге')
     return result_text[:-1]
 
 
 def f_info_about_u_read(user_id):
     # статистика о полученых пользователем стихотворений
+    print(f'пользователь {user_id} запросил статистику чтения')
     poem, author = f_select_read(user_id)
     if not poem:
         return False
-
     poem = poem.split('*')
     author = author.split('*')
     author_set = list(set(author))
@@ -157,7 +150,6 @@ def f_info_about_u_read(user_id):
     for i in range(len(author_set)):
         result_text += f'Из них {author.count(author_set[i])} написал {author_set[i]}' + '\n'
 
-    print(f'пользователь {user_id} запросил статистику чтения')
     return result_text[:-1]
 
 
@@ -193,10 +185,8 @@ def f_delete_user(user_id:int):
 
 # --чтение txt файлов в папке--#
 d = read_txt.dataset
-
 # --подключение к базеданных--#
 conn = sqlite3.connect(create_db.file_db, check_same_thread=False)
-
 # --работа с базой данных--#
 with conn:
     cursor = conn.cursor()
@@ -205,14 +195,4 @@ with conn:
         f_insert_db(d)
     # ---delete and create db--- #
     # f_delete_table_db()
-
-    #print(f_db_table())
-    #print(f_select_all_db('users'))
-    #print(f_select_random_poem())
-    #print(f_update_users_table(292189201, 778, 'Фамилия'))
-    #print(f_info_about_book())
-    #print(f_info_about_uread(292189201))
-    #print(f_get_next(292189201))
-    
-
     conn.commit()
