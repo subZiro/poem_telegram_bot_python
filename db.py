@@ -15,7 +15,6 @@ import read_txt
 
 def f_db_table():
     # получение списка всех таблиц бд
-    
     sql = """SELECT name FROM sqlite_master 
         WHERE type='table'
         ORDER BY name;"""
@@ -92,7 +91,7 @@ def f_select_poem_by_author():
 
 def f_insert_db(data):
     # вставка новых данных
-    k = 0
+    k = j = 0
     for line in data:
         # --извлечение отделного элемента из списка и создание списка элементов в базе данных--#
         stih = line[3]
@@ -102,6 +101,7 @@ def f_insert_db(data):
             k += 1
             cursor.execute("""INSERT INTO poems (book, author, title_stih, stih, date_stih) 
                             VALUES (?,?,?,?,?)""", (line[0], line[1], line[2], line[3], line[4]))
+
     print('{} стихотворений добавлены'.format(k))
 
        
@@ -193,6 +193,10 @@ with conn:
 
     if d:
         f_insert_db(d)
+    
     # ---delete and create db--- #
-    # f_delete_table_db()
+    # f_clear_poem_table_db()
+    # f_clear_user_table_db()
+
+    #print(f_select_all_db('poems'))
     conn.commit()
