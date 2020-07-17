@@ -6,7 +6,12 @@ import re
 
 
 def f_read_files_in_folder(foldername:str):
-	# read txt files in folder
+	"""
+	read txt files in folder
+
+	:param args: tuple:
+    :return kwargs: dict:
+    """
 	if not os.path.exists(foldername):
 		os.makedirs(foldername)
 	folder = os.listdir(foldername)
@@ -20,8 +25,12 @@ def f_read_files_in_folder(foldername:str):
 
 
 def f_read_txt(file_name:str):
-	# read txt book 
+	"""
+	read txt book 
 
+	:param args: tuple:
+    :return kwargs: dict:
+    """
 	book_list = []
 
 	with open(file_name, encoding="utf8", errors='ignore') as file:
@@ -39,8 +48,13 @@ def f_read_txt(file_name:str):
 
 
 def f_correct_book(array:list):
-	# приведение считанных данных к формату 
-	# ['name_book', 'author', 'title_stih', 'stih', 'date_stih', 'title_stih', 'stih', 'date_stih',...]
+	"""
+	приведение считанных данных к формату 
+	['name_book', 'author', 'title_stih', 'stih', 'date_stih', 'title_stih', 'stih', 'date_stih',...]
+
+	:param args: tuple:
+    :return kwargs: dict:
+    """
 	result = []
 	sum_s = ''
 	array[0],array[1] = array[1], array[0]
@@ -64,11 +78,16 @@ def f_correct_book(array:list):
 
 
 def f_array_to_BATSD(array:list):
-	# принимает список и возвращает 
-	# name_book - название книги, author - автор стихов, 
-	# title_stih - название стиха, stih_list - стихотворение, date_stih - дата написания стиха
+	"""
+	принимает список и возвращает 
+	name_book - название книги, author - автор стихов, 
+	title_stih - название стиха, stih_list - стихотворение, date_stih - дата написания стиха
+
+	:param args: tuple:
+    :return kwargs: dict:
+    """
 	title_stih, date_stih = [], []
-	
+
 	#--add name_book--#
 	name_book = array[0]
 	#--add author_stih--#
@@ -106,7 +125,12 @@ def f_array_to_BATSD(array:list):
 
 
 def f_concat_natds(n, a, t, s, d):
-	# concat book data to one array
+	"""
+	concat book data to one array
+	
+	:param args: tuple:
+    :return kwargs: dict:
+    """
 	result = [[n, a, t[i], s[i], d[i]] for i in range(len(s))]
 	return result
 
