@@ -302,8 +302,10 @@ def check_new_poem_in_dir(admin_id):
             cursor = conn.cursor()
             f_insert_db(d)
             conn.commit()
+        return len(d)
     else:
         logging.info('новых стихотворений не найдено')
+        return 0 
  
 
 if __name__ == '__main__':

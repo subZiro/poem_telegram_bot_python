@@ -27,9 +27,38 @@ class Config:
 	LOG_DIR = BASEDIR + '/log'
 	LOG_FILENAME = 'filelog.log'
 	LOG_FILE = LOG_DIR + '/' + LOG_FILENAME
-	LOG_FORMAT = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
+	LOG_FORMAT = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-3s [%(asctime)s]  %(message)s'
 
+	# --commands for user--#
+	commands = {  
+	    # command description used in the "help" command
+	    'start': 'Начало использования бота',
+	    'help': 'Информация о доступных командах',
+	    'random': 'Получить случайное стихотворение',
+	    'next': 'Получить следующее стихотворение',
+	    'book': 'Получить информацию о хранимых стихотворениях',
+	    'info': 'Получить статистику по прочитанным стихотворениям',
+	    'restart': 'Сброс всей статистии',
+	    'end': 'Удаление бота, завершение работы с ботом',
+	    'author': 'Выбрать автора',  #TODO
+	    'reset_author': 'Сброс выборки по авторам',  #TODO
+	}
+
+	# --commands for admin--#
+	admin_commands = {
+	    # admin command desc used in the "adminhelp" command
+	    'adminhelp': 'Информация о доступных командах',
+	    'statu': 'Количество активных пользователей',
+	    'staturd': 'Статистика чтений пользователей',
+	    'toppoem': 'Топ просмотреных стихотворений N-int(дефолт 5)',
+	    'topauthor': 'Топ просмотреных стихотворений N-int(дефолт 1)',
+	    'dcu': 'Пересоздать таблицу пользователей',
+	    'dcru': 'Пересоздать таблицу просмотров пользователей',
+	    'checkpoem': 'Проверка и добавление новых стихотворений', #TODO
+	}
 
 if __name__ == '__main__':
 	print('(-_-)')
 
+'''
+телеграм прокси проверить на пригодность для бота 
