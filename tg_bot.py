@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# v 1.31
+# v 1.34
 
 import telebot
 from telebot import apihelper
@@ -14,7 +14,10 @@ import sys
 
 # sys.path.append("../dataset_for_poem_TG_bot_python")
 # sys.path.append("dataset_for_poem_TG_bot_python")
-import db
+
+
+# import db
+import db as db
 from config import Config
 
 
@@ -55,7 +58,7 @@ def auth(func):
     """обертка, проверка авторизации пользователей"""
     def wrapper(message):
         user_id = message.chat.id
-        if db.f_user_in_table(user_id):
+        if db.get_user(user_id=user_id):
             return func(message)
         else:
             bot.send_message(user_id, f'{message.chat.first_name}, У вас нет доступа.\n' +
@@ -83,13 +86,13 @@ def is_admin(func):
 def welcome(message):
     """обработка команды /start"""
     user_id = message.chat.id
-    if not db.f_user_in_table(user_id):
+    if not db.get_user(user_id=user_id):
         log_msg = LOG_STR_USR + u', запросил регистрацию'
         logger.info(log_msg.format(user_id))
-        db.f_reg_user(user_id)
+        db.add_user(user_id=user_id)
         bot.send_message(user_id, "Привет, как дела?\nСписок доступных команд /help")
     else:
-        logger.info(LOG_STR_USR_DO.format(user_id, '/start', commands['start']))
+        logger.info(LOG_STR_USR_DO.format(user_id, '/start', COMMANDS['start']))
         bot.send_message(user_id, "Привет, еще раз!")
 
 
@@ -113,12 +116,12 @@ def command_help(message):
 def command_random(message):
     """обработка команды /random"""
     user_id = message.chat.id
-    logger.info(LOG_STR_USR_DO.format(user_id, '/random', commands['random']))
-    r_poem = db.f_get_poem()
-    author = r_poem[2]
-    title = r_poem[3]
-    poem = title.center(40, '_') + '\n\n' + r_poem[4] + '\n' + author.rjust(40, '\x20')
-    db.f_update_read_user(user_id, r_poem[0], author)
+    logger.info(LOG_STR_USR_DO.format(user_id, '/random', COMMANDS['random']))
+    r_poem = db.get_random_poem()  
+    author = r_poem[4]
+    title = r_poem[1]
+    poem = title.center(40, '_') + '\n\n' + r_poem[2] + '\n' + author.rjust(40, '\x20')
+    db.add_poem_in_useractive(user_id=user_id, poem_id=r_poem[0])
     bot.send_message(user_id, poem)
     
 
@@ -130,66 +133,66 @@ def command_next(message):
     user_id = message.chat.id
     logger.info(LOG_STR_USR_DO.format(user_id, '/next', COMMANDS['next']))
     n_poem = db.f_get_next(user_id)
-    author = n_poem[2]
-    title = n_poem[3]
+    author = n_poem[4]
+    title = n_poem[1]
     poem = title.center(40, '_') + '\n\n' + n_poem[4] + '\n' + author.rjust(40, '\x20')
-    db.f_update_read_user(user_id, n_poem[0], author)
+    db.add_poem_in_useractive(user_id=user_id, poem_id=n_poem[0])
     bot.send_message(user_id, poem)
 
 
-# --book command-- #
-@bot.message_handler(commands=['book'])
+# --authors command-- #
+@bot.message_handler(commands=['authors'])
 @auth
 def command_book(message):
     """
-    обработка команды /book
-    информация о стихотворениях в базе
+    обработка команды /authors
+    информация о авторах в базе
     """
     user_id = message.chat.id
-    logger.info(LOG_STR_USR_DO.format(user_id, '/book', COMMANDS['book']))
-    ib_text = db.f_info_about_book(user_id)
-    bot.send_message(user_id, ib_text)
+    logger.info(LOG_STR_USR_DO.format(user_id, '/authors', COMMANDS['authors']))
+    ia_text = db.get_info_about_author(type_info='all')
+    bot.send_message(user_id, ia_text)
+
+
+# --poems command-- #
+@bot.message_handler(commands=['poems'])
+@auth
+def command_book(message):
+    """
+    обработка команды /poems
+    информация о произведениях в базе
+    """
+    user_id = message.chat.id
+    logger.info(LOG_STR_USR_DO.format(user_id, '/poems', COMMANDS['poems']))
+    ia_text = db.get_info_about_poem(type_info='count')
+    bot.send_message(user_id, ia_text)
 
 
 # --info command-- #
-@bot.message_handler(commands=['info'])
+@bot.message_handler(commands=['myinfo'])
 @auth
 def command_info(message):
     """
-    обработка команды /info
+    обработка команды /myinfo
     сколько получил пользователь стихотворений от бота
     """
     user_id = message.chat.id
-    logger.info(LOG_STR_USR_DO.format(user_id, '/info', COMMANDS['info']))
-    inf_text = db.f_info_about_u_read(user_id)
+    logger.info(LOG_STR_USR_DO.format(user_id, '/myinfo', COMMANDS['myinfo']))
+    inf_text = db.get_info_about_useractive(user_id=user_id)
     bot.send_message(user_id, inf_text)
 
 
-# --restart command-- #
-@bot.message_handler(commands=['restart'])
-@auth
-def command_restart(message):
-    """
-    обработка команды /restart
-    сброс просмотров пользователя
-    """
-    user_id = message.chat.id
-    logger.info(LOG_STR_USR_DO.format(user_id, '/restart', COMMANDS['restart']))
-    db.f_delete_user('usersreceived', user_id)
-    bot.send_message(user_id, f'{message.chat.first_name}, ваши просмоты сброшены')
-
-
 # --author command-- #
-@bot.message_handler(commands=['author'])  # TODO
+@bot.message_handler(commands=['setauthor'])  # TODO
 @auth
 def command_author(message):
     """
-    обработка команды /author
+    обработка команды /setauthor
     выборка по автору
     """
     user_id = message.chat.id
-    logger.info(LOG_STR_USR_DO.format(user_id, '/author', COMMANDS['author']))
-    bot.send_message(user_id, 'команда author пока в разработке')
+    logger.info(LOG_STR_USR_DO.format(user_id, '/setauthor', COMMANDS['setauthor']))
+    bot.send_message(user_id, 'команда setauthor пока в разработке')
 
 
 # --reset command-- #
@@ -205,6 +208,20 @@ def command_reset(message):
     bot.send_message(user_id, 'команда reset пока в разработке')
 
 
+# --restart command-- #
+@bot.message_handler(commands=['restart'])
+@auth
+def command_restart(message):
+    """
+    обработка команды /restart
+    сброс просмотров пользователя
+    """
+    user_id = message.chat.id
+    logger.info(LOG_STR_USR_DO.format(user_id, '/restart', COMMANDS['restart']))
+    db.restart_useractive(user_id=user_id)
+    bot.send_message(user_id, f'{message.chat.first_name}, ваши просмоты сброшены')
+
+
 # --end command-- #
 @bot.message_handler(commands=['end'])
 @auth
@@ -215,8 +232,8 @@ def command_end(message):
     """
     user_id = message.chat.id
     logger.info(LOG_STR_USR_DO.format(user_id, '/reset_author', COMMANDS['reset_author']))
-    db.f_delete_user('usersreceived', user_id)
-    db.f_delete_user('users', user_id)
+    db.restart_useractive(user_id=user_id)
+    db.delete_user(user_id=user_id)
     bot.send_message(user_id, 'Прощай, я буду скучать')
 
 
@@ -245,8 +262,8 @@ def admin_command_user_stat(message):
     """
     admin_id = message.chat.id
     logger.info(LOG_STR_ADM_DO.format(admin_id, '/statu', AMD_COMMANDS['statu']))
-    all_user = db.f_select_all_db('users')
-    bot.send_message(admin_id, f'Всего активных пользователей: {len(all_user)}')
+    all_user = db.get_count_active_users()
+    bot.send_message(admin_id, f'Всего зарегистрированных пользователей: {all_user}')
 
 
 # --admin recreate users table-- #
@@ -260,8 +277,9 @@ def admin_recreate_users_table(message):
     """
     admin_id = message.chat.id
     logger.info(LOG_STR_ADM_DO.format(admin_id, '/dcu', AMD_COMMANDS['dcu']))
-    db.f_clear_user_table_db()
-    bot.send_message(admin_id, 'таблица пользователей удалена и создана')
+    # db.f_clear_user_table_db()
+    # bot.send_message(admin_id, 'таблица пользователей удалена и создана')
+    bot.send_message(admin_id, 'Команда временно отключена')
 
 
 # --admin recreate users received table-- #
@@ -275,8 +293,10 @@ def admin_recreate_users_table(message):
     """
     admin_id = message.chat.id
     logger.info(LOG_STR_ADM_DO.format(admin_id, '/dcru', AMD_COMMANDS['dcru']))
-    db.f_clear_userreceived_table_db()
-    bot.send_message(admin_id, 'таблица просмотров удалена и создана')
+    # db.f_clear_userreceived_table_db()
+    # bot.send_message(admin_id, 'таблица просмотров удалена и создана')
+    bot.send_message(admin_id, 'Команда временно отключена')
+
 
 
 # --admin check new poem in directory-- #
@@ -287,9 +307,10 @@ def admin_recreate_users_table(message):
     """обработка команды /checkpoem """
     admin_id = message.chat.id
     logger.info(LOG_STR_ADM_DO.format(admin_id, '/checkpoem', AMD_COMMANDS['checkpoem']))
-    cnt_new_poem = db.check_new_poem_in_dir(admin_id=admin_id)
-    bot.send_message(admin_id, 'Новых стихотворений не найдено' if not cnt_new_poem else
-        'Добавлено {} новых стихотворений'.format(cnt_new_poem))
+    # cnt_new_poem = db.check_new_poem_in_dir(admin_id=admin_id)
+    # bot.send_message(admin_id, 'Новых стихотворений не найдено' if not cnt_new_poem else
+    #     'Добавлено {} новых стихотворений'.format(cnt_new_poem))
+    bot.send_message(admin_id, 'Команда временно отключена')
 
 
 # --any text message-- #
