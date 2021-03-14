@@ -132,10 +132,11 @@ def command_next(message):
     """обработка команды /next"""
     user_id = message.chat.id
     logger.info(LOG_STR_USR_DO.format(user_id, '/next', COMMANDS['next']))
-    n_poem = db.f_get_next(user_id)
+    n_poem = db.get_next_poem(user_id)
+    print(n_poem)
     author = n_poem[4]
     title = n_poem[1]
-    poem = title.center(40, '_') + '\n\n' + n_poem[4] + '\n' + author.rjust(40, '\x20')
+    poem = title.center(40, '_') + '\n\n' + n_poem[2] + '\n' + author.rjust(40, '\x20')
     db.add_poem_in_useractive(user_id=user_id, poem_id=n_poem[0])
     bot.send_message(user_id, poem)
 
