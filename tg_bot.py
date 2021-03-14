@@ -267,6 +267,22 @@ def admin_command_user_stat(message):
     bot.send_message(admin_id, f'Всего зарегистрированных пользователей: {all_user}')
 
 
+# --admin stat user reads command-- #
+@bot.message_handler(commands=["staturd"])
+@auth
+@is_admin
+def admin_command_user_stat(message):
+    """
+    обработка команды /statu
+    получение количества активных пользователей
+    """
+    admin_id = message.chat.id
+    logger.info(LOG_STR_ADM_DO.format(admin_id, '/staturd', AMD_COMMANDS['staturd']))
+    msg = db.get_info_about_usersread()
+    msg_out = f'Статистика чтения по пользователям\n' + msg if msg else 'Нет просмотров'
+    bot.send_message(admin_id, msg_out)
+
+
 # --admin recreate users table-- #
 @bot.message_handler(commands=["dcu"])
 @auth
